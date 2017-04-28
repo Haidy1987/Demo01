@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            border: 0;
+            list-style: none;
+        }
+        body{
+            background: lemonchiffon;
+        }
+        ul {
+            position: absolute;
+            bottom: -100px;
+            height: 80px;
+
+        }
+
+        .left, .right {
+            cursor: pointer;
+            width: 50px;
+            height: 50px;
+            position: absolute;
+            background: yellowgreen;
+            top: -350px;
+            left: -200px;
+        }
+        .left{
+            background: url('img/prev.png');
+        }
+        .right {
+            background: url('img/next.png');
+            left: 1300px;
+        }
+
+        .li_in {
+            width: 34px;
+            height: 34px;
+            border: 3px solid #ccc;
+            border-radius: 50%;
+            margin: 10px;
+            float: left;
+        }
+        .li_in:nth-child(3){
+            margin-left:460px;
+        }
+
+        .cur {
+            width: 42px;
+            height: 42px;
+            border:none;
+            background: greenyellow;
+        }
+
+        .box {
+            margin: 100px auto;
+            text-align: center;
+            font-size: 100px;
+            width: 1200px;
+            height: 600px;
+            position: relative;
+        }
+
+        .box div {
+            width: 800px;
+            height: 500px;
+            top: 50px;
+            left: 200px;
+
+            position: absolute;
+        }
+        .box img{
+            vertical-align: top;
+            width: 100%;
+        }
+
+        /*.box div:nth-child(1) {
+
+            background: pink;
+        }
+
+        .box div:nth-child(2) {
+
+            background: skyblue;
+        }
+
+        .box div:nth-child(3) {
+
+            background: orange;
+        }
+
+        .box div:nth-child(4) {
+
+            background: cyan;
+        }
+
+        .box div:nth-child(5) {
+
+            background: mediumpurple;
+        }*/
+
+    </style>
+    <script src="jquery-3.1.1.js"></script>
+    <script>
+
+        $(function () {
+            var json = [
+                {   //  1
+                    width: 400,
+                    top: 20,
+                    left: 50,
+                    opacity: 0.2,
+                },
+                {  // 2
+                    width: 600,
+                    top: 70,
+                    left: 0,
+                    opacity: 0.8,
+                },
+                {   // 3
+                    width: 800,
+                    top: 100,
+                    left: 200,
+                    opacity: 1,
+                },
+                {  // 4
+                    width: 600,
+                    top: 70,
+                    left: 600,
+                    opacity: 0.8,
+                },
+                {   //5
+                    width: 400,
+                    top: 20,
+                    left: 750,
+                    opacity: 0.2,
+                }
+            ];
+            var img_index = [2, 3, 4, 3, 2];
+            var cur_index = 0;
+            //{z:2,z:3,z:4,z:3,z:2};
+            change();
+            function change() {
+                $.each(json, function (index, value) {
+                    if (img_index[index] == '4') {
+                        cur_index = index;//记录当前索引值
+                        $('.li_in').eq(cur_index).addClass('cur').siblings().removeClass('cur');
+                    }
+                    $('.box_in').eq(index).css({'z-index': img_index[index]}).stop().animate(value);
+                });
+            }
+
+            //左点击
+            $('.left').on('click', function () {
+                ch_left();
+            })
+            function ch_left() {
+                json.unshift(json.pop());
+                img_index.unshift(img_index.pop());
+                change();
+            }
+
+            //右点击
+            $('.right').on('click', function () {
+                ch_right();
+            })
+            function ch_right() {
+                json.push(json.shift());
+                img_index.push(img_index.shift());
+                change();
+            }
+
+            //li点击
+            $('.li_in').on('mouseenter', function () {
+                var _index = $(this).index() - 2;
+                var changetime = Math.abs(_index - cur_index);
+                if (_index > cur_index) {//4>2
+                    run(ch_left, changetime);
+                } else {
+                    run(ch_right, changetime);
+                }
+                function run(fn, changetime) {
+                    for (var i = 0; i < changetime; i++)
+                        fn();
+                    changetime--;
+                    if (changetime <= 0)return;
+                }
+            });
+
+            //自动播放
+            var box = $('.box');
+            box.on('mouseover',function(){
+                clearInterval(box.timer);
+            })
+            box.on('mouseout',function(){
+                autoPlay();
+            })
+            autoPlay();
+            function autoPlay(){
+                clearInterval(box.timer);
+                box.timer = setInterval(function(){
+                    ch_left();
+                },2000);
+            }
+            /*****************************************************************/
+            /*//li点击
+             var flag = true;
+             $('.li_in').on('mouseenter', function () {
+             if (flag) {
+             flag = false;
+             var _index = $(this).index() - 2;
+             var changetime = Math.abs(_index - cur_index);
+             if (_index > cur_index) {//4>2
+             run(ch_left, changetime);
+             } else {
+             run(ch_right, changetime);
+             }
+             }
+             else {
+             return;
+             }
+             })
+             function run(fn, changetime) {
+             clearInterval(timer);
+             var timer = setInterval(function () {
+             fn();
+             changetime--;
+             if (changetime <= 0) {
+             clearInterval(timer);
+             flag = true;
+             return;
+             }
+             }, 10)
+             }*/
+
+            /***********************************************************/
+
+
+        });
+
+
+    </script>
+</head>
+<body>
+<div class="box">
+    <div class="box_in"><img src="img/1.jpg"/></div>
+    <div class="box_in"><img src="img/2.jpg"/></div>
+    <div class="box_in"><img src="img/3.jpg"/></div>
+    <div class="box_in"><img src="img/4.jpg"/></div>
+    <div class="box_in"><img src="img/5.jpg"/></div>
+    <ul>
+        <li class="left"></li>
+        <li class="right"></li>
+        <li class="li_in"></li>
+        <li class="li_in"></li>
+        <li class="li_in"></li>
+        <li class="li_in"></li>
+        <li class="li_in"></li>
+    </ul>
+</div>
+
+</body>
+</html>
